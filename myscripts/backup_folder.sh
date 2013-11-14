@@ -27,4 +27,8 @@ DATE=$(date +%Y%m%d%H%M%S)
 FILENAME="$BACKUP_FOLDER/${PREFIX}_${DATE}${SUFFIX}"
 
 
-tar -cjf $FILENAME $FOLDER && echo "$FILENAME created successfully"
+tar -cjf $FILENAME $FOLDER
+
+if [ "$?" = "0" ]; then
+	echo "$FILENAME created successfully"
+fi
