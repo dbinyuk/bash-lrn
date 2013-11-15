@@ -1,4 +1,7 @@
 #!/bin/bash
-if [ "foo" = "foo" ]; then
-echo выражение вычислилось как истина
+VAR="foo"
+
+if [ "$VAR" = "foo" ]; then
+	echo выражение вычислилось как истина
+	echo $VAR
 fi
