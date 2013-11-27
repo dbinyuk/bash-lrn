@@ -5,5 +5,8 @@ if groups www-data | grep  subversion2; then
 else
 	echo "User added to group"
 	sudo usermod -a -G subversion dbinyuk
-
+fi
 }
+
+add_user_to_group
+
