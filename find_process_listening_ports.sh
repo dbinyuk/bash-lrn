@@ -1,0 +1,1 @@
+sudo lsof -i -n -P | grep -i list | awk '{print $1 $9 $10}'
