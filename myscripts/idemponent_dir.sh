@@ -11,4 +11,4 @@ function make_dir() {
 	fi
 }
 
-make_dir "/home/svn/myproject/testo"
+make_dir "/home/svn/myproject"
