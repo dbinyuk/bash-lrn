@@ -1,4 +1,5 @@
 #!/bin/bash -evx
+
 apt-get update
 #use curl to get ruby version 1.9.3 from server
 	\curl -sSL https://get.rvm.io  | bash -s stable --ruby=1.9.3
@@ -78,6 +79,9 @@ gpg --export packages@opscode.com | sudo tee /etc/apt/trusted.gpg.d/opscode-keyr
 
 #install required gems
 	gem install chef-server chef-server-api chef-server chef-solr chef-server-webui --no-ri --no-rdoc
+	
+	#source /usr/local/rvm/scripts/rvm
+	#gem install chef-server-webui --no-ri --no-rdoc
 
 #install webui
 #gem install chef-server-webui --no-ri --no-rdoc
@@ -149,9 +153,11 @@ echo  $! > "/var/chef/chef-expander.pid"
 nohup chef-solr 2>&1 > /var/log/chef/chef-solr.log &
 echo  $! > "/var/chef/chef-solr.pid"
 
-nohup chef-server --no-daemonize 2>&1 > /var/log/chef/chef-server.log &
+nohup 
+ --no-daemonize 2>&1 > /var/log/chef/chef-server.log &
 echo  $! > "/var/chef/chef-server.pid"
 
+sleep 60
 nohup chef-server-webui -p 4040 2>&1 > /var/log/chef/chef-server-webui.log &
 echo  $! > "/var/chef/webui.pid"
 
