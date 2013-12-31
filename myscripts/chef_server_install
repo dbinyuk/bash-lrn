@@ -16,10 +16,10 @@ apt-get update
 	gem install chef --version 10.30.2 --no-ri --no-rdoc
 
 #install CouchDB
-apt-get install couchdb -y
+	apt-get install -y couchdb
 
 #install rabbitmq-server
-	apt-get -y install rabbitmq-server
+	apt-get install -y rabbitmq-server
 
 #configure rabbitmq
 	rabbitmqctl add_vhost /chef
@@ -27,7 +27,7 @@ apt-get install couchdb -y
 	sudo rabbitmqctl set_permissions -p /chef chef ".*" ".*" ".*"
 
 #install openjdk
-	apt-get  install openjdk-6-jre-headless
+	apt-get  install -y openjdk-6-jre-headless
 
 #install zlib libxml
 	apt-get install -y zlib1g-dev libxml2-dev
@@ -57,8 +57,9 @@ gpg --export packages@opscode.com | sudo tee /etc/apt/trusted.gpg.d/opscode-keyr
 #apt-get update to update package lists
 	apt-get update
 
-#install opscode-keyring which saves keys for last date
-	apt-get install -y -f opscode-keyring
+#install opscode-keyring which saves keys for last date 
+#added from http://stackoverflow.com/questions/7798501/how-to-make-apt-get-accept-new-config-files-in-a-unattended-install-of-debian-fr
+	apt-get install -y -o Dpkg::Options::="--force-confnew" opscode-keyring
 
 	apt-get -y upgrade
 
@@ -142,18 +143,18 @@ EOF
 
 chef-solr-installer
 
-nohup chef-server-webui -p 4040 2>&1 > /var/log/chef/chef-server-webui.log &
-echo  $! > "/var/chef/webui.pid"
+nohup chef-expander -n1 2>./err_log.txt 1>&2 &
+echo  $! > "/var/chef/chef-expander.pid"
 
 nohup chef-solr 2>&1 > /var/log/chef/chef-solr.log &
 echo  $! > "/var/chef/chef-solr.pid"
 
-nohup chef-expander -n1 2>./err_log.txt 1>&2 &
-echo  $! > "/var/chef/chef-expander.pid"
-
 nohup chef-server --no-daemonize 2>&1 > /var/log/chef/chef-server.log &
 echo  $! > "/var/chef/chef-server.pid"
 
+nohup chef-server-webui -p 4040 2>&1 > /var/log/chef/chef-server-webui.log &
+echo  $! > "/var/chef/webui.pid"
+
 sleep 30
 #Test
-for PORT in 4000 4040 5984 5672 8983; do echo checking: $PORT $(lsof -i :$PORT > /dev/null || echo FAIL); done| grep FAIL  && echo "FAIL" || echo SUCCESS
+for PORT in 4000 4040 5984 5672 8983; do echo checking: $PORT $(lsof -i :$PORT || echo FAIL); done| grep FAIL  && echo "FAIL" || echo SUCCESS
