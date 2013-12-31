@@ -76,11 +76,11 @@ gpg --export packages@opscode.com | sudo tee /etc/apt/trusted.gpg.d/opscode-keyr
 
 	make && make install
 
-#install chef-server gem
-	gem install chef-server chef-server-api chef-server chef-solr
+#install required gems
+	gem install chef-server chef-server-api chef-server chef-solr chef-server-webui --no-ri --no-rdoc
 
 #install webui
-gem install chef-server-webui --no-ri --no-rdoc
+#gem install chef-server-webui --no-ri --no-rdoc
 
 #Creating directories which required for chef-server configuration file
 mkdir -p /var/chef/ca /var/chef/cache /var/chef/nodes /var/chef/openid/store /var/chef/openid/cstore /var/chef/search_index /var/chef/roles /var/chef/support /var/log/chef/ /etc/chef/
@@ -132,8 +132,8 @@ EOH
 #creating file for solr
 
 #cat > /etc/chef/solr.rb
-SOLRTFILE=/etc/chef/solr.rb
-cat <<- EOF > $SOLRTFILE
+SOLRFILE=/etc/chef/solr.rb
+cat <<- EOF > $SOLRFILE
 supportdir = "/var/chef"
 solr_jetty_path File.join(supportdir, "solr", "jetty")
 solr_data_path  File.join(supportdir, "solr", "data")
