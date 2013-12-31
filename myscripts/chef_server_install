@@ -1,5 +1,5 @@
-#!/bin/bash -e
-
+#!/bin/bash -evx
+apt-get update
 #use curl to get ruby version 1.9.3 from server
 	\curl -sSL https://get.rvm.io  | bash -s stable --ruby=1.9.3
 
@@ -15,8 +15,11 @@
 #install chef version 10.30.2
 	gem install chef --version 10.30.2 --no-ri --no-rdoc
 
+#install CouchDB
+apt-get install couchdb -y
+
 #install rabbitmq-server
-	apt-get install rabbitmq-server
+	apt-get -y install rabbitmq-server
 
 #configure rabbitmq
 	rabbitmqctl add_vhost /chef
@@ -24,30 +27,42 @@
 	sudo rabbitmqctl set_permissions -p /chef chef ".*" ".*" ".*"
 
 #install openjdk
-	apt-get install openjdk-6-jre-headless
+	apt-get  install openjdk-6-jre-headless
 
 #install zlib libxml
-	apt-get install zlib libxml
+	apt-get install -y zlib1g-dev libxml2-dev
+
 
 #Add the Opscode APT Repository
 	echo "deb http://apt.opscode.com/ `lsb_release -cs`-0.10 main"
 
-#Add the GPG Key
-	mkdir -p /etc/apt/trusted.gpg.d
-	gpg --keyserver keys.gnupg.net --recv-keys 83EF826A
-	gpg --export packages@opscode.com
+mkdir -p /etc/apt/trusted.gpg.d
+#based on https://tickets.opscode.com/browse/CHEF-2803
+gpg --fetch-key http://apt.opscode.com/packages@opscode.com.gpg.key
+gpg --export packages@opscode.com | sudo tee /etc/apt/trusted.gpg.d/opscode-keyring.gpg > /dev/null
 
-	gpg --export packages@opscode.com | sudo tee /etc/apt/trusted.gpg.d/opscode-keyring.gpg > /dev/null
+	#curl -o /etc/apt/trusted.gpg.d/opscode-keyring.gpg http://apt.opscode.com/packages@opscode.com.gpg.key
+	#gpg --import /etc/apt/trusted.gpg.d/opscode-keyring.gpg
+#Add the GPG Key
+	#mkdir -p /etc/apt/trusted.gpg.d
+	#gpg --keyserver keys.gnupg.net --recv-keys 83EF826A
+	#gpg --export packages@opscode.com
+
+	#gpg --export packages@opscode.com | sudo tee /etc/apt/trusted.gpg.d/opscode-keyring.gpg > /dev/null
+
+
+	echo "deb http://apt.opscode.com/ `lsb_release -cs`-0.10 main" > /etc/apt/sources.list.d/opscode.list
+
 
 #apt-get update to update package lists
 	apt-get update
 
 #install opscode-keyring which saves keys for last date
-	apt-get install opscode-keyring
+	apt-get install -y -f opscode-keyring
 
-	apt-get upgrade
+	apt-get -y upgrade
 
-	apt-get install libgecode-dev
+	apt-get install -y libgecode-dev
 
 #getting gecode 
 	cd /tmp
@@ -67,12 +82,13 @@
 gem install chef-server-webui --no-ri --no-rdoc
 
 #Creating directories which required for chef-server configuration file
-mkdir -p /var/chef/ca /var/chef/cache /var/chef/nodes /var/chef/openid/store /var/chef/openid/cstore /var/chef/search_index /var/chef/roles /var/chef/support /var/log/chef/
+mkdir -p /var/chef/ca /var/chef/cache /var/chef/nodes /var/chef/openid/store /var/chef/openid/cstore /var/chef/search_index /var/chef/roles /var/chef/support /var/log/chef/ /etc/chef/
+IPADRR=$(ifconfig  | grep 'inet addr:'| grep -v '127.0.0.1' | cut -d: -f2 | awk '{ print $1}')
 
-OUTFILE=/tmp/server.rb
+OUTFILE=/etc/chef/server.rb
 
 #writing chef-server configuration file
-cat << EOH > $OUTFILE
+cat <<- EOH > $OUTFILE
 log_level          :info
 log_location       STDOUT
 ssl_verify_mode    :verify_none
@@ -97,9 +113,10 @@ web_ui_client_name     "chef-webui"
 web_ui_key             "/etc/chef/webui.pem"
  
 web_ui_admin_user_name "admin"
+web_ui_admin_default_password "secret"
 
  
-supportdir = "/var/chef/support"
+supportdir = "/var/chef"
 
 solr_jetty_path File.join(supportdir, "solr", "jetty")
 solr_data_path  File.join(supportdir, "solr", "data")
@@ -110,6 +127,20 @@ umask 0022
  
 Mixlib::Log::Formatter.show_time = false
 EOH
+
+#creating file for solr
+
+#cat > /etc/chef/solr.rb
+SOLRTFILE=/etc/chef/solr.rb
+cat <<- EOF > $SOLRTFILE
+supportdir = "/var/chef"
+solr_jetty_path File.join(supportdir, "solr", "jetty")
+solr_data_path  File.join(supportdir, "solr", "data")
+solr_home_path  File.join(supportdir, "solr", "home")
+solr_heap_size  "256M"
+EOF
+
+chef-solr-installer
 
 nohup chef-server-webui -p 4040 2>&1 > /var/log/chef/chef-server-webui.log &
 echo  $! > "/var/chef/webui.pid"
@@ -122,3 +153,7 @@ echo  $! > "/var/chef/chef-expander.pid"
 
 nohup chef-server --no-daemonize 2>&1 > /var/log/chef/chef-server.log &
 echo  $! > "/var/chef/chef-server.pid"
+
+sleep 30
+#Test
+for PORT in 4000 4040 5984 5672 8983; do echo checking: $PORT $(lsof -i :$PORT > /dev/null || echo FAIL); done| grep FAIL  && echo "FAIL" || echo SUCCESS
