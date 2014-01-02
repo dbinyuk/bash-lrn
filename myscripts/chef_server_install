@@ -1,4 +1,4 @@
-#!/bin/bash -evx
+#!/bin/bash -e
 
 apt-get update
 #use curl to get ruby version 1.9.3 from server
@@ -153,9 +153,9 @@ echo  $! > "/var/chef/chef-expander.pid"
 nohup chef-solr 2>&1 > /var/log/chef/chef-solr.log &
 echo  $! > "/var/chef/chef-solr.pid"
 
-nohup 
- --no-daemonize 2>&1 > /var/log/chef/chef-server.log &
+nohup chef-server --no-daemonize 2>&1 > /var/log/chef/chef-server.log &
 echo  $! > "/var/chef/chef-server.pid"
+
 
 sleep 60
 nohup chef-server-webui -p 4040 2>&1 > /var/log/chef/chef-server-webui.log &
