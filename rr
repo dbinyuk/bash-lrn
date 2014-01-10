@@ -1,0 +1,6 @@
+#!/bin/bash
+
+SCRIPT_PATH=${1?"Local path to script"}
+SERVER_ADDR=${2?"Specify SERVER_ADDR"}
+scp $SCRIPT_PATH  $SERVER_ADDR:/tmp/script.sh && \
+ssh $SERVER_ADDR "sudo su -c 'bash -evx /tmp/script.sh'"
