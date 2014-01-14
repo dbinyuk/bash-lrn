@@ -1,0 +1,8 @@
+#!/bin/bash
+
+. ./libidemponent
+k=0;
+ for k in $*; do
+#previus before optimization variant was "for k in $1 $2 $3; do" but if we want be independent of argument number we must use more usefull construction which I use
+            group_add "$k"
+        done
