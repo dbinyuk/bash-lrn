@@ -34,9 +34,5 @@ chef_server_url          'http://$SERVER_ADDR:4000'
 syntax_check_cache_path  '$CHEF_PATH/syntax_check_cache'
 EOH
 
-
-#ssh $SERVER_ADDR 'sudo su superdima -c "knife client list"'| grep $CHEF_CLIENT_NAME && echo SUCCES
-
 knife client list | grep "$CHEF_CLIENT_NAME" && echo SUCCESS
-
 

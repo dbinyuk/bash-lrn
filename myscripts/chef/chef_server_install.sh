@@ -13,6 +13,21 @@ apt-get update
 #make this version as default
 	rvm use --default 1.9.3
 
+# http://stackoverflow.com/questions/19579984/sinatra-server-wont-start-wrong-number-of-arguments
+#remove thin, assuming it has 2.0.0pre version
+	echo | gem uninstall thin -a -x -I --force
+#install valid version of thin
+	gem install thin --version 1.6.1 --no-ri --no-rdoc
+
+#uninstalling bunny and install needed version
+   echo | gem uninstall bunny -a -x -I --force
+   gem install bunny --version 0.6.0 --no-ri --no-rdoc
+
+# uninstall haml and installing needed version
+   echo |gem uninstall haml -a -x -I --force
+   gem install haml -v 3.1.8 --no-ri --no-rdoc
+
+
 #install chef version 10.30.2
 	gem install chef --version 10.30.2 --no-ri --no-rdoc
 
@@ -81,12 +96,7 @@ gpg --export packages@opscode.com | sudo tee /etc/apt/trusted.gpg.d/opscode-keyr
     
 
 	gem install  chef-server chef-server-api chef-solr chef-server-webui --no-ri --no-rdoc
-
-	# http://stackoverflow.com/questions/19579984/sinatra-server-wont-start-wrong-number-of-arguments
-	#remove thin, assuming it has 2.0.0pre version
-	echo | gem uninstall thin -a --ignore-dependencies --force
-	#install valid version of thin
-	gem install thin --version 1.6.1 --no-ri --no-rdoc
+	
 
 	#source /usr/local/rvm/scripts/rvm
 	#gem install chef-server-webui --no-ri --no-rdoc
@@ -173,4 +183,3 @@ sleep 30
 #Test
 for PORT in 4000 4040 5984 5672 8983; do echo checking: $PORT $(lsof -i :$PORT || echo FAIL); done| grep FAIL  && echo "FAIL" || echo SUCCESS
 
-#scp /home/dbinyuk/work/bash-lrn/myscripts/chef_server_install 173.1.205.29:/tmp/validation.pem 

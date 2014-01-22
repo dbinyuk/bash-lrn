@@ -1,6 +1,6 @@
 #!/bin/bash -evx
 
-CHEFUSER=${CHEFUSER:-"superdima"}
+CHEFUSER=${1:-"superdima8"}
 
 useradd $CHEFUSER
 
@@ -26,7 +26,7 @@ cache_options( :path => '$CHEF_PATH/checksums' )
 EOH
 
 
-knife  client create $CHEFUSER -c $KNIFEFILE -d -a -f $CHEF_PATH/$CHEFUSER.pem
+knife client create $CHEFUSER -c $KNIFEFILE -d -a -f $CHEF_PATH/$CHEFUSER.pem
 
 cat <<- EOH > $KNIFEFILE
 log_level                :info
