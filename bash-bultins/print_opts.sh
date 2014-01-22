@@ -1,18 +1,27 @@
 #!/bin/bash
 
-#getopt usage sample code
+# print_opts solution
 
 
-while getopts "u:p:" OPT; do
+while getopts "u:p:h:" OPT; do
     case $OPT in
-        u) echo u switch;;
-        p)  VAR=$OPTARG;;
+        u) USR=$OPTARG;;
+        p) PASSWD=$OPTARG;;
+        h) HOST=$OPTARG;;
     esac
 done
 
-echo OPTIND = $OPTIND
+HOST=${HOST:-'localhost'}
+USR=${USR?'You must specify user'}
 
-echo VAR = $VAR
+
+shift $(($OPTIND - 1))
+
+echo USR: $USR
+echo PASSWD: $PASSWD
+echo HOST: $HOST
+
+echo Commands:
 
 i=1
 for arg in $*; do
@@ -20,12 +29,4 @@ for arg in $*; do
 	i=$((i+1))
 done
 
-shift $(($OPTIND - 1))
 
-echo "****** after shift *****" #Commands
-
-i=1
-for arg in $*; do
-	echo arg${i} = $arg
-	i=$((i+1))
-done
