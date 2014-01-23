@@ -16,7 +16,6 @@ done
 
 IMAGE=${IMAGE?"IMAGE is not defined"}
 
-#FORMAT=xml
 METHOD='/grid/server/delete?'
 
 function buildBaseURL {
