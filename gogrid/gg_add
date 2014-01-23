@@ -6,12 +6,12 @@
 # last changed: 23.01.2014 13:59
 
 
-source "$HOME/work/bash-lrn/gogrid/libgg.sh"
+source ./libgg
 
 while getopts "c:i:r:n:d:" OPT; do
     case $OPT in
-	c) GGC=$OPTARG;;    
-        i) IMAGE=$OPTARG;;
+	c) GGC=$OPTARG;;
+    i) IMAGE=$OPTARG;;
 	r) RAM=$OPTARG;;
 	n) NAME=$OPTARG;;
 	d) DESCR=$OPTARG;;
@@ -22,24 +22,20 @@ DESCR=${DESCR:-""}
 NAME=${NAME?"NAME is not defined"}
 IMAGE=${IMAGE?"IMAGE is not defined"}
 RAM=${RAM?"RAM is not defined"}
-GTIME=`date +%s`
 IP=$(./gg_ip_list)
 
 METHOD='/grid/server/add?'
 
 function buildBaseURL {
 	#creating URL which contains of name image ram description and auth parameters
-	
+
 	#https://wiki.gogrid.com/index.php/API:grid.server.add
 
-        URL="$1$2&sig=$3&name=$4&image=$5&ram=$6&description=$7&format=$8&v=$9&api_key=${10}&ip=${11}"
+        URL="$1$2&sig=$3&name=$4&image=$5&ram=$6&format=$7&v=$8&api_key=$9&ip=${10}&description=${11}"
 }
 
-# Get to work
-
-getMD5sum $APIKEY $SECRET $GTIME
-IP=$(./gg_ip_list)
-buildBaseURL $SERVER $METHOD $SIG $NAME $IMAGE $RAM $DESCR $FORMAT $VERSION $APIKEY $IP
+getSig
+buildBaseURL $SERVER $METHOD $SIG $NAME $IMAGE $RAM $FORMAT $VERSION $APIKEY $IP $DESCR
 # id	name	description	ip.id	ip.ip	ip.subnet	ip.public
 getURL $URL| awk -F, '!/#/ {print $1, $2, $5}'
 

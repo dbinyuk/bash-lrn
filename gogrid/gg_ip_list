@@ -5,11 +5,11 @@
 # created: 22.01.2014 13:41
 # last changed: 23.01.2014 14:08
 
-source "$HOME/work/bash-lrn/gogrid/libgg.sh"
+source ./libgg
 
 while getopts "c:n:" OPT; do
     case $OPT in
-	c) GGC=$OPTARG;;    
+	c) GGC=$OPTARG;;
         n) NUMITEMS=$OPTARG;;
     esac
 done
@@ -17,12 +17,11 @@ done
 NUMITEMS=${NUMITEMS:-"1"}
 IPSTATE="Unassigned"
 IPTYPE="Public"
-GTIME=`date +%s`
 METHOD='/grid/ip/list?'
 
 function buildBaseURL {
 	#creating URL which contains of numitems ipstate iptype and auth parameters
-	
+
 	#https://wiki.gogrid.com/index.php/API:grid.ip.list
 
         URL="$1$2&sig=$3&num_items=$4&ip.state=$5&ip.type=$6&format=$7&v=$8&api_key=$9"
@@ -30,7 +29,7 @@ function buildBaseURL {
 
 # Get to work
 
-getMD5sum $APIKEY $SECRET $GTIME
+getSig
 buildBaseURL $SERVER $METHOD $SIG $NUMITEMS $IPSTATE $IPTYPE $FORMAT $VERSION $APIKEY
 getURL $URL| awk -F, '!/#/ {print $2}'
 

@@ -5,32 +5,31 @@
 # created: 22.01.2014 13:38
 # last changed: 23.01.2014 14:02
 
-source "$HOME/work/bash-lrn/gogrid/libgg.sh"
+source ./libgg
 
 while getopts "c:i:" OPT; do
     case $OPT in
-	c) GGC=$OPTARG;;    
-        i) IMAGE=$OPTARG;;
+	c) GGC=$OPTARG;;
+    i) IMAGE=$OPTARG;;
     esac
 done
 
 IMAGE=${IMAGE?"IMAGE is not defined"}
-GTIME=`date +%s`
 
 #FORMAT=xml
-METHOD='/grid/server/add?'
+METHOD='/grid/server/delete?'
 
 function buildBaseURL {
 	#creating URL which contains of name image and auth parameters
 
 	#https://wiki.gogrid.com/index.php/API:grid.server.delete
 
-        URL="$1$2&sig=$3&image=$4&format=$5&v=$6&api_key=$7"
+        URL="$1$2&sig=$3&id=$4&format=$5&v=$6&api_key=$7"
 }
 
 # Get to work
 
-getMD5sum $APIKEY $SECRET $GTIME
+getSig
 buildBaseURL $SERVER $METHOD $SIG $IMAGE $FORMAT $VERSION $APIKEY
 getURL $URL
 

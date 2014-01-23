@@ -5,7 +5,7 @@
 # created: 23.01.2014 13:42
 # last changed: 23.01.2014 14:11
 
-source "$HOME/work/bash-lrn/gogrid/libgg.sh"
+source ./libgg
 
 while getopts "c:" OPT; do
     case $OPT in
@@ -13,12 +13,11 @@ while getopts "c:" OPT; do
     esac
 done
 
-GTIME=`date +%s`
 METHOD='/grid/server/list?'
 
 function buildBaseURL {
 	#creating URL which contains of gogrid configure and auth parameters
-	
+
 	#https://wiki.gogrid.com/index.php/API:grid.server.list
 
 	URL="$1$2&sig=$3&format=$4&v=$5&api_key=$6"
@@ -26,7 +25,7 @@ function buildBaseURL {
 
 # Get to work
 
-getMD5sum $APIKEY $SECRET $GTIME
+getSig
 buildBaseURL $SERVER $METHOD $SIG $FORMAT $VERSION $APIKEY
 getURL $URL
 
