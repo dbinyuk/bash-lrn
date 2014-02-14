@@ -21,11 +21,10 @@
 PATH=/sbin:/usr/sbin:/bin:/usr/bin
 DESC="Description: my init script"
 NAME=init_example
-DAEMON=/home/dbinyuk/work/bash-lrn/myscripts/init_example
+DAEMON=/etc/init.d/init_example
 DAEMON_ARGS="--options args"
 PIDFILE=/tmp/init_script.pid
 SCRIPTNAME=/etc/init.d/$NAME
-DAEMONPID=$(pgrep init_example)
 
 #. ./init_example
 # Exit if the package is not installed
@@ -51,11 +50,7 @@ do_start()
 	#   0 if daemon has been started
 	#   1 if daemon was already running
 	#   2 if daemon could not be started
-	start-stop-daemon --start --quiet --chuid root --background --pidfile $PIDFILE --exec $DAEMON --test > /dev/null \
-		|| return 1
-	start-stop-daemon --start --quiet --pidfile $PIDFILE --exec $DAEMON -- \
-		$DAEMON_ARGS \
-		|| return 2
+	start-stop-daemon --start --chuid dbinyuk --quiet --pidfile $PIDFILE --exec $DAEMON || return 1
 	# Add code here, if necessary, that waits for the process to be ready
 	# to handle requests from services started subsequently which depend
 	# on this one.  As a last resort, sleep for some time.
@@ -71,8 +66,11 @@ do_stop()
 	#   1 if daemon was already stopped
 	#   2 if daemon could not be stopped
 	#   other if a failure occurred
-	kill -9 "$DAEMONPID"
-	start-stop-daemon --stop --quiet --retry=TERM/30/KILL/5 --pidfile $PIDFILE --name $NAME
+	DAEMONPID=$(pgrep init_example) 
+	#echo $DAEMONPID > /tmp/init_script.pid
+	echo $DAEMONPID > $PIDFILE
+#	kill -9 "$DAEMONPID"
+	start-stop-daemon --stop --chuid dbinyuk --quiet --retry=TERM/30/KILL/5 --pidfile $PIDFILE --name $NAME
 	RETVAL="$?"
 	[ "$RETVAL" = 2 ] && return 2
 	# Wait for children to finish too if this is a daemon that forks
@@ -81,7 +79,7 @@ do_stop()
 	# that waits for the process to drop all resources that could be
 	# needed by services started subsequently.  A last resort is to
 	# sleep for some time.
-	start-stop-daemon --stop --quiet --oknodo --retry=0/30/KILL/5 --exec $DAEMON
+	start-stop-daemon --stop --chuid 0 --quiet --oknodo --retry=0/30/KILL/5 --exec $DAEMON
 	[ "$?" = 2 ] && return 2
 	# Many daemons don't delete their pidfiles when they exit.
 	rm -f $PIDFILE

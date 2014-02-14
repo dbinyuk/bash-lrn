@@ -1,0 +1,19 @@
+#!/bin/bash
+
+INITPID=$$
+
+echo $$
+#echo $! > /home/dbinyuk/work/init_mat_ego.pid
+
+#NAME=my-app
+USER=dbinyuk
+LOGFILE=/tmp/init_log.log
+INITPID=$(("${INITPID}"+1))
+echo "$INITPID"
+while true; do
+sudo -u "$USER" date; 
+date;
+echo current user: $USER >> "$LOGFILE"
+sleep 10
+done &
+
